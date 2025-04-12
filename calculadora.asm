@@ -1,3 +1,19 @@
+#-- Primeiro trabalho prático de Organização e Arquitetura de Computadores
+#-- Calculadora sequêncial
+#-- 
+#-- O código a seguir é a implementação de uma calculadora sequêncial.
+#-- Ela possui as seguintes operações:
+#--
+#-- 	+ <num>: soma o número armazenadado com <num>
+#-- 	- <num>: subtrai o número armazenadado com <num>
+#-- 	* <num>: multiplica o número armazenadado com <num>
+#-- 	/ <num>: divide o número armazenadado por <num>
+#-- 	u: desfaz a última operação
+#--     f: finaliza a execução da calculadora
+#--
+#-- Na primeira operação, a entrada consiste de <num> <operacao> <num>.
+#-- Cada elemento da entrada deve estar em uma nova linha.
+
 	.data
 	.align 0
 quebra: .asciz "\n"
