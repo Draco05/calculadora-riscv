@@ -214,7 +214,7 @@ finalizar:
 #	a3 - caractere da operacao
 finalizar_operacao_atual:
 	# Empilha o valor de ra, a0, a1, a2, a3
-	addi sp, sp, -20 # reserva 8 bytes no stack
+	addi sp, sp, -20 # reserva 20 bytes no stack
 	sw ra, 0(sp) # salva o ra atual no stack
 	sw a0, 4(sp) # salva a0 no stack
 	sw a1, 8(sp) # salva a1 no stack
@@ -252,10 +252,19 @@ finalizar_operacao_atual:
 	ecall
 	
 	# Imprime operando
+	bgt t0, zero, print_operando 
+	li a7, 11
+	li a0, '('
+	ecall
+print_operando:
 	add a0, t0, zero
 	li a7, 1
 	ecall
-	
+	bgt t0, zero, fim_print_operando
+	li a7, 11
+	li a0, ')'
+	ecall
+fim_print_operando:
 	# Imprime '='
 	li a0, '='
 	li a7, 11
@@ -273,6 +282,9 @@ finalizar_operacao_atual:
 	
 	# Volta para a escolha da operação
 	j escolher_operacao
+
+print_parenteses:
+
 
 
 # parametro a0: dado guardado	
