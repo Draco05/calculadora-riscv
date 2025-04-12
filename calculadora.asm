@@ -92,26 +92,38 @@ soma:
 	li a7, 5
 	ecall
 	
-	# Faz a operação de soma com a cabeça da lista encadeada e salva em a0
-	add a0, a0, a1 # número lido + cabeça lista
+	# Faz a operação de soma com a cabeça da lista encadeada e salva em a2
+	add a2, a0, a1 # número lido + cabeça lista
+	li a3, '+'
 	j finalizar_operacao_atual
 
 #-- Função finalizar_operacao_atual
 # Salva o resultado na lista encadeada e imprime o resultado da operação
 # Parâmetros:
-#	a0 - valor para salvar	
+#	a0 - valor lido da operação atual
+#	a1 - valor realizado a operação sobre
+#	a2 - resultado da operação
+#	a3 - caractere da operacao
 finalizar_operacao_atual:
-	# Empilha o valor de ra e a0
-	addi sp, sp, -8 # reserva 8 bytes no stack
+	# Empilha o valor de ra, a0, a1, a2, a3
+	addi sp, sp, -20 # reserva 8 bytes no stack
 	sw ra, 0(sp) # salva o ra atual no stack
 	sw a0, 4(sp) # salva a0 no stack
+	sw a1, 8(sp) # salva a1 no stack
+	sw a2, 12(sp) # salva a2 no stack
+	sw a3, 16(sp) # salva a3 no stack
 	
+	add a0, a2, zero
 	jal ra, add_inicio_lista  # adiciona o em a0 na lista
 	
-	# Desempilha ra
+	# Desempilha ra, a0, a1, a2, a3
 	lw ra, 0(sp) # recupera o ra da stack
 	lw a0, 4(sp) # recupera a0 da stack
-	addi sp, sp, 8 # libera os 8 bytes da stack
+	lw a1, 8(sp) # recupera a1 da stack
+	lw a2, 12(sp) # recupera a2 da stack
+	lw a3, 16(sp) # recupera a3 da stack
+
+	addi sp, sp, 20 # libera os 20 bytes da stack
 	
 	add t0, a0, zero
 	
@@ -120,14 +132,30 @@ finalizar_operacao_atual:
 	li a7, 11
 	ecall
 	
-	# Imprime resultado
+	# Imprime: <valor da cabeça (a1)><operacao(a3)><operando(a0)>=<resultado (a2)>
+	# Imprime valor da cabeça
+	add a0, a1, zero
+	li a7, 1
+	ecall
+	
+	# Imprime caracetere da operacao
+	add a0, a3, zero
+	li a7, 11
+	ecall
+	
+	# Imprime operando
 	add a0, t0, zero
 	li a7, 1
 	ecall
 	
-	# Imprime \n
-	li a0, '\n'
+	# Imprime '='
+	li a0, '='
 	li a7, 11
+	ecall
+	
+	# Imprime resultado
+	add a0, a2, zero
+	li a7, 1
 	ecall
 	
 	# Imprime \n
