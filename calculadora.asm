@@ -80,11 +80,20 @@ escolher_operacao:
 	li t0, '+'
 	beq a0, t0, soma
 	
+	li t0, '-'
+	beq a0, t0, subtracao
+	
+	li t0, '*'
+	beq a0, t0, multiplicacao
+	
+	li t0, '/'
+	beq a0, t0, divisao
+	
 	jr ra
 	
 #-- Função soma
 # Lê um inteiro para a operação e faz a soma com a cabeça da lista_encadeada,
-# adicionando o valor na pilha
+# adicionando o valor na lista encadeada
 # Parâmetros:
 #	a1 - valor da cabeça da lista encadeada
 soma:
@@ -93,8 +102,53 @@ soma:
 	ecall
 	
 	# Faz a operação de soma com a cabeça da lista encadeada e salva em a2
-	add a2, a0, a1 # número lido + cabeça lista
+	add a2, a1, a0 # cabeça lista + número lido
 	li a3, '+'
+	j finalizar_operacao_atual
+	
+#-- Função subtracao
+# Lê um inteiro para a operação e faz a subtração com a cabeça da lista_encadeada,
+# adicionando o valor na lista encadeada
+# Parâmetros:
+#	a1 - valor da cabeça da lista encadeada
+subtracao:
+	# Lê um inteiro
+	li a7, 5
+	ecall
+	
+	# Faz a operação de subtracao com a cabeça da lista encadeada e salva em a2
+	sub a2, a1, a0 # cabeça lista - número lido
+	li a3, '-'
+	j finalizar_operacao_atual
+	
+#-- Função multiplicacao
+# Lê um inteiro para a operação e faz a multiplicacao com a cabeça da lista_encadeada,
+# adicionando o valor na lista encadeada
+# Parâmetros:
+#	a1 - valor da cabeça da lista encadeada
+multiplicacao:
+	# Lê um inteiro
+	li a7, 5
+	ecall
+	
+	# Faz a operação de multiplicacao com a cabeça da lista encadeada e salva em a2
+	mul a2, a1, a0 # cabeça lista * número lido
+	li a3, '*'
+	j finalizar_operacao_atual
+	
+#-- Função divisao
+# Lê um inteiro para a operação e faz a divisao com a cabeça da lista_encadeada,
+# adicionando o valor na lista encadeada
+# Parâmetros:
+#	a1 - valor da cabeça da lista encadeada
+divisao:
+	# Lê um inteiro
+	li a7, 5
+	ecall
+	
+	# Faz a operação de divisao com a cabeça da lista encadeada e salva em a2
+	div a2, a1, a0 # cabeça lista / número lido
+	li a3, '/'
 	j finalizar_operacao_atual
 
 #-- Função finalizar_operacao_atual
