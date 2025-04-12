@@ -17,6 +17,7 @@
 	.data
 	.align 0
 quebra: .asciz "\n"
+operacao: .space 3
 	.align 2
 p_cabeca_lista: .word
 	.text
@@ -24,8 +25,120 @@ p_cabeca_lista: .word
 	.globl main
 main:
 	la s0, p_cabeca_lista
-	lw zero, 0(s0) # inicia a cabeça da lista como NULL
-	li s1, 5 # contador
+	jal ra, iniciar_calculadora
+	
+	li a7, 10
+	ecall
+
+#-- Função iniciar_calculadora
+# Lê a primeira entrada da calculadora
+iniciar_calculadora:
+	# Lê um inteiro
+	li a7, 5
+	ecall 
+	
+	# Empilha o valor de ra
+	addi sp, sp, -4 # reserva 4 bytes no stack
+	sw ra, 0(sp) # salva o ra atual no stack
+	
+	jal ra, add_inicio_lista  # adiciona o valor lido (está em a0) na lista
+	
+	# Desempilha ra
+	lw ra, 0(sp) # recupera o ra da stack
+	addi sp, sp, 4 # libera os 4 bytes da stack
+	
+	# Continua em escolher_operacao
+
+#-- Função escolher_operacao
+# Lê um caracetere da operação da entrada e escolhe a função correspondente
+# Funciona como um switch/case
+# Caso a operação escolhida não existe, ele imprime uma mensagem
+escolher_operacao:
+	# Lê cabeça da lista e salva em t1
+	# Empilha o valor de ra
+	addi sp, sp, -4 # reserva 4 bytes no stack
+	sw ra, 0(sp) # salva o ra atual no stack
+	
+	jal ra, valor_cabeca_lista
+	add t1, a0, zero
+	
+	# Desempilha ra
+	lw ra, 0(sp) # recupera o ra da stack
+	addi sp, sp, 4 # libera os 4 bytes da stack
+	
+	# Lê caractere da operacao
+	la a0, operacao
+	li a1, 3 # \n codigo \n
+	li a7, 8
+	ecall
+	lb a0, 0(a0)
+	
+	# Salva valor da cabeça em a1 (parâmetro das operações)
+	add a1, t1, zero
+	
+	# Escolhe operação
+	li t0, '+'
+	beq a0, t0, soma
+	
+	jr ra
+	
+#-- Função soma
+# Lê um inteiro para a operação e faz a soma com a cabeça da lista_encadeada,
+# adicionando o valor na pilha
+# Parâmetros:
+#	a1 - valor da cabeça da lista encadeada
+soma:
+	# Lê um inteiro
+	li a7, 5
+	ecall
+	
+	# Faz a operação de soma com a cabeça da lista encadeada e salva em a0
+	add a0, a0, a1 # número lido + cabeça lista
+	j finalizar_operacao_atual
+
+#-- Função finalizar_operacao_atual
+# Salva o resultado na lista encadeada e imprime o resultado da operação
+# Parâmetros:
+#	a0 - valor para salvar	
+finalizar_operacao_atual:
+	# Empilha o valor de ra e a0
+	addi sp, sp, -8 # reserva 8 bytes no stack
+	sw ra, 0(sp) # salva o ra atual no stack
+	sw a0, 4(sp) # salva a0 no stack
+	
+	jal ra, add_inicio_lista  # adiciona o em a0 na lista
+	
+	# Desempilha ra
+	lw ra, 0(sp) # recupera o ra da stack
+	lw a0, 4(sp) # recupera a0 da stack
+	addi sp, sp, 8 # libera os 8 bytes da stack
+	
+	add t0, a0, zero
+	
+	# Imprime \n
+	li a0, '\n'
+	li a7, 11
+	ecall
+	
+	# Imprime resultado
+	add a0, t0, zero
+	li a7, 1
+	ecall
+	
+	# Imprime \n
+	li a0, '\n'
+	li a7, 11
+	ecall
+	
+	# Imprime \n
+	li a0, '\n'
+	li a7, 11
+	ecall
+	
+	# Volta para a escolha da operação
+	j escolher_operacao
+
+
 loop_criar:
 	mv a0, s1
 	mul a0, a0, a0 # guardar contador ao quadrado
