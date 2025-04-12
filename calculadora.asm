@@ -93,3 +93,13 @@ remove_cabeca_lista:
 	sw t1, 0(t0) # proximo nó vira a nova cabeça
 fim_remove_cabeca_lista:
 	jr ra
+
+# retorna em a0 o valor que está na cabeça da lista
+valor_cabeca_lista:
+	mv a0, zero # inicia o valor do dado como 0
+	la t0, p_cabeca_lista # t0 = endereço do ponteiro para cabeça da lista
+	lw t0, 0(t0) # t0 = endereço da cabeça da lista
+	beq zero, t0, fim_valor_cabeca_lista # cabeca da lista é NULL 
+	lw a0, 4(t0) # a0 = dado guardado na cabeça
+fim_valor_cabeca_lista:
+	jr ra
