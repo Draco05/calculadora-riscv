@@ -139,23 +139,6 @@ finalizar_operacao_atual:
 	j escolher_operacao
 
 
-loop_criar:
-	mv a0, s1
-	mul a0, a0, a0 # guardar contador ao quadrado
-	jal ra, add_inicio_lista
-	addi s1, s1, -1
-	bgt s1, zero, loop_criar
-	
-	li s1, 5
-loop_imprimir:
-	jal ra, imprime_cabeca_lista
-	jal ra, remove_cabeca_lista
-	addi s1, s1, -1
-	bgt s1, zero, loop_imprimir
-	
-	li a7, 10
-	ecall
-
 # parametro a0: dado guardado	
 # retorna o endereço do nó alocado em a0
 aloca_no:
