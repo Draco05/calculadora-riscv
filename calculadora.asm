@@ -18,6 +18,7 @@
 	.align 0
 quebra: .asciz "\n"
 operacao: .space 3
+r_atual: .asciz "Resultado atual: "
 	.align 2
 p_cabeca_lista: .word
 	.text
@@ -89,6 +90,12 @@ escolher_operacao:
 	li t0, '/'
 	beq a0, t0, divisao
 	
+	li t0, 'u'
+	beq a0, t0, undo
+	
+	li t0, 'f'
+	beq a0, t0, finalizar
+	
 	jr ra
 	
 #-- Função soma
@@ -150,6 +157,53 @@ divisao:
 	div a2, a1, a0 # cabeça lista / número lido
 	li a3, '/'
 	j finalizar_operacao_atual
+
+#-- Função undo
+# Desfaz a última operação, imprimindo o resultado atual
+undo:
+	# Remove o ultimo resultado da lista
+	# Empilha o valor de ra
+	addi sp, sp, -4 # reserva 4 bytes no stack
+	sw ra, 0(sp) # salva o ra atual no stack
+	
+	jal ra, remove_cabeca_lista
+	
+	# Desempilha ra
+	lw ra, 0(sp) # recupera o ra da stack
+	addi sp, sp, 4 # libera os 4 bytes da stack
+	
+	# Imprime "Resultado atual: "
+	la a0, r_atual
+	li a7, 4
+	ecall
+	
+	# Imprime resultado atual (cabeça da lista)
+	# Empilha o valor de ra
+	addi sp, sp, -4 # reserva 4 bytes no stack
+	sw ra, 0(sp) # salva o ra atual no stack
+	
+	jal ra, valor_cabeca_lista
+	
+	# Desempilha ra
+	lw ra, 0(sp) # recupera o ra da stack
+	addi sp, sp, 4 # libera os 4 bytes da stack
+	
+	li a7, 1
+	ecall
+	
+	# Imprime '\n'
+	li a0, '\n'
+	li a7, 11
+	ecall
+	
+	# Volta para a escolha da operação
+	j escolher_operacao
+			
+#-- Função finalizar
+# Encerra a execução da calculadora
+finalizar:
+	jr ra
+
 
 #-- Função finalizar_operacao_atual
 # Salva o resultado na lista encadeada e imprime o resultado da operação
