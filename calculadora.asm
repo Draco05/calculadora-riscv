@@ -283,14 +283,13 @@ fim_print_operando:
 	# Volta para a escolha da operação
 	j escolher_operacao
 
-print_parenteses:
+# Funções realacionadas a lista encadeada
 
-
-
-# parametro a0: dado guardado	
-# retorna o endereço do nó alocado em a0
+# Aloca um espaço para um nó
+# Parametro a0: dado guardado	
+# Retorno a0: o endereço do nó alocado
 aloca_no:
-	mv t0, a0
+	mv t0, a0 # salva o dado em t0
 	li a7, 9 # alocar dinamicamente
 	li a0, 8 # 2 words: uma de ponteiro outra de dado 
 	ecall
@@ -298,8 +297,8 @@ aloca_no:
 	sw t0, 4(a0) # armazena o dado no nó
 	jr ra
 
-# cria um novo nó e o coloca no inicio da lista
-# parametro a0: dado guardado na lista
+# Adiciona um valor ao inicio da lista
+# Parametro a0: dado guardado na lista
 add_inicio_lista:
 	addi sp, sp, -4 # reserva 4 bytes no stack
 	sw ra, 0(sp) # salva o ra atual no stack
@@ -308,39 +307,27 @@ add_inicio_lista:
 	lw ra, 0(sp) # recupera o ra da stack
 	addi sp, sp, 4 # libera os 4 bytes da stack
 	
-	la t1, p_cabeca_lista
-	lw t2, 0(t1) # ponteiro para a cabeça da lista
+	la t1, p_cabeca_lista # t1 = endereço do ponteiro para a cabeça da lista
+	lw t2, 0(t1) # t2 = endereço da cabeça da lista
 	sw t2, 0(t0) # novo nó aponta para a cabeça da lista
 	sw t0, 0(t1) # novo nó vira nova cabeça da lista
 	
 	jr ra
 
-# imprime a cabeça da lista
-imprime_cabeca_lista:
-	li a7, 1 # servico de imprimir inteiro
-	la a0, p_cabeca_lista # a0 = endereço do ponteiro da cabeça da lista
-	lw a0, 0(a0) # a0 = endereço da cabeça da lista
-	beq zero, a0, fim_imprime_cabeca_lista # caso a cabeça seja NULL
-	lw a0, 4(a0) # a0 = dado na cabeça da lista
-	ecall
-	li a7, 4 # servico de imprimir string
-	la a0, quebra # quebra a linha
-	ecall
-fim_imprime_cabeca_lista:
-	jr ra
-
+# Remove o nó que está na cabeça da lista
 remove_cabeca_lista:
-	la t0, p_cabeca_lista
-	lw t1, 0(t0) # endereço da cabeça da lista
+	la t0, p_cabeca_lista # t0 = endereço do ponteiro para a cabeça da lista
+	lw t1, 0(t0) # t1 = endereço da cabeça da lista
 	beq zero, t1, fim_remove_cabeca_lista # caso endereço seja NULL
 	lw t1, 0(t1) # proximo nó
 	sw t1, 0(t0) # proximo nó vira a nova cabeça
 fim_remove_cabeca_lista:
 	jr ra
 
-# retorna em a0 o valor que está na cabeça da lista
+
+# Retorna a0: valor guardado na cabeça da lista 
 valor_cabeca_lista:
-	mv a0, zero # inicia o valor do dado como 0
+	mv a0, zero # inicia o valor do dado como 0 (caso não tenha dado na lista)
 	la t0, p_cabeca_lista # t0 = endereço do ponteiro para cabeça da lista
 	lw t0, 0(t0) # t0 = endereço da cabeça da lista
 	beq zero, t0, fim_valor_cabeca_lista # cabeca da lista é NULL 
