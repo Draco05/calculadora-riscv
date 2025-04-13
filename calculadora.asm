@@ -19,8 +19,17 @@
 	.align 0
 operacao: 
 	.space 3
-r_atual: 
-	.asciz "Resultado atual: "
+	
+undo_reverter:
+	.asciz "Revertendo operação ("
+undo_resultado_anterior:
+	.asciz ") de resultado "
+undo_resultado_atual:
+	.asciz ". Resultado atual: "
+undo_sem_operacao:
+	.asciz "Não há operações para realizar o undo!\n"
+finalizar_str:
+	.asciz "Finalizando execução da calculadora!\n"
 invalida:
 	.asciz "Operação inválida. Digite a operação novamente!\n"
 str_operacao:
@@ -59,6 +68,7 @@ iniciar_calculadora:
 	# Empilha o valor de ra
 	addi sp, sp, -4 # reserva 4 bytes no stack
 	sw ra, 0(sp) # salva o ra atual no stack
+	
 	li a1, 0 # simbolo do primeiro input é "nenhum"
 	jal ra, add_inicio_lista  # adiciona o valor lido (está em a0) na lista
 	
@@ -87,10 +97,10 @@ escolher_operacao:
 	
 	# Lê caractere da operacao
 	la a0, operacao
-	li a1, 3 # \n codigo \n
+	li a1, 3 # Lê 3 bytes: \n codigo \n
 	li a7, 8
 	ecall
-	lb a0, 0(a0)
+	lb a0, 0(a0) # Salva código da operação em a0
 	
 	# Salva valor da cabeça em a1 (parâmetro das operações)
 	add a1, t1, zero
@@ -196,29 +206,56 @@ undo:
 	addi sp, sp, -4 # reserva 4 bytes no stack
 	sw ra, 0(sp) # salva o ra atual no stack
 	
-	jal ra, remove_cabeca_lista
+	jal ra, valor_cabeca_lista
+	add t0, a0, zero
+	add t1, a1, zero
 	
 	# Desempilha ra
 	lw ra, 0(sp) # recupera o ra da stack
 	addi sp, sp, 4 # libera os 4 bytes da stack
 	
-	# Imprime "Resultado atual: "
-	la a0, r_atual
+	beq t1, zero, undo_final
+	
+	# Imprime "Revertendo operação "
+	la a0, undo_reverter
 	li a7, 4
 	ecall
 	
-	# Imprime resultado atual (cabeça da lista)
+	# Imprime operacao
+	add a0, t1, zero
+	li a7, 11
+	ecall
+	
+	# Imprime " de resultado "
+	la a0, undo_resultado_anterior
+	li a7, 4
+	ecall
+	
+	# Imprime resultado antigo
+	add  a0, t0, zero
+	li a7, 1
+	ecall
+	
 	# Empilha o valor de ra
 	addi sp, sp, -4 # reserva 4 bytes no stack
 	sw ra, 0(sp) # salva o ra atual no stack
 	
+	jal ra, remove_cabeca_lista
 	jal ra, valor_cabeca_lista
+	add t0, a0, zero
 	
 	# Desempilha ra
 	lw ra, 0(sp) # recupera o ra da stack
 	addi sp, sp, 4 # libera os 4 bytes da stack
+		
+	# Imprime ".Resultado atual: "
+	la a0, undo_resultado_atual
+	li a7, 4
+	ecall
 	
+	# Resultado está em t0
 	li a7, 1
+	add a0, t0, zero
 	ecall
 	
 	# Imprime '\n'
@@ -228,10 +265,20 @@ undo:
 	
 	# Volta para a escolha da operação
 	j escolher_operacao
-			
+
+#-- Imprime uma mensagem dizendo que não há operações para reverter.
+undo_final:
+	la a0, undo_sem_operacao
+	li a7, 4
+	ecall
+	j escolher_operacao
+		
 #-- Função finalizar
 # Encerra a execução da calculadora
 finalizar:
+	la a0, finalizar_str
+	li a7, 4
+	ecall
 	jr ra
 
 
