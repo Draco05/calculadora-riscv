@@ -4,20 +4,19 @@
 #-- O código a seguir é a implementação de uma calculadora sequêncial.
 #-- Ela possui as seguintes operações:
 #--
-#-- 	+ <num>: soma o número armazenadado com <num>
-#-- 	- <num>: subtrai o número armazenadado com <num>
-#-- 	* <num>: multiplica o número armazenadado com <num>
-#-- 	/ <num>: divide o número armazenadado por <num>
+#-- 	+ <num>: soma o número armazenado com <num>
+#-- 	- <num>: subtrai o número armazenado com <num>
+#-- 	* <num>: multiplica o número armazenado com <num>
+#-- 	/ <num>: divide o número armazenado por <num>
 #-- 	u: desfaz a última operação
 #--     f: finaliza a execução da calculadora
 #--
-#-- Na primeira operação, a entrada consiste de <num> <operacao> <num>.
+#-- Na primeira operação, a entrada consiste de um número, seguindo de umas das operações acima.
 #-- Cada elemento da entrada deve estar em uma nova linha.
 
 	.data
+	# Dados estáticos de 1 byte
 	.align 0
-quebra: 
-	.asciz "\n"
 operacao: 
 	.space 3
 r_atual: 
@@ -26,7 +25,10 @@ invalida:
 	.asciz "Operação inválida. Digite a operação novamente!\n"
 str_operacao:
 	.asciz "Operação: "
+div_zero:
+	.asciz "Não é possível dividir por zero. Digite o valor novamente!\n"
 	
+	# Dados estáticos de 4 bytes
 	.align 2
 p_cabeca_lista: 
 	.word
@@ -171,10 +173,20 @@ divisao:
 	li a7, 5
 	ecall
 	
+	# Se número lido for zero, imprime mensagem de erro
+	beq a0, zero, divisao_zero
+	
 	# Faz a operação de divisao com a cabeça da lista encadeada e salva em a2
 	div a2, a1, a0 # cabeça lista / número lido
 	li a3, '/'
 	j finalizar_operacao_atual
+
+# Imprime mensagem de erro e retorna para leitura de número.
+divisao_zero:
+	la a0, div_zero
+	li a7, 4
+	ecall
+	j divisao
 
 #-- Função undo
 # Desfaz a última operação, imprimindo o resultado atual
