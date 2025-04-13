@@ -24,6 +24,8 @@ r_atual:
 	.asciz "Resultado atual: "
 invalida:
 	.asciz "Operação inválida. Digite a operação novamente!\n"
+str_operacao:
+	.asciz "Operação: "
 	
 	.align 2
 p_cabeca_lista: 
@@ -249,14 +251,14 @@ finalizar_operacao_atual:
 
 	addi sp, sp, 20 # libera os 20 bytes da stack
 	
-	add t0, a0, zero
+	add t0, a0, zero # Salva o valor de a0 em t0
 	
-	# Imprime \n
-	li a0, '\n'
-	li a7, 11
+	# Imprime "Operação: "
+	la a0, str_operacao
+	li a7, 4
 	ecall
 	
-	# Imprime: <valor da cabeça (a1)><operacao(a3)><operando(a0)>=<resultado (a2)>
+	# Imprime: < valor da cabeça (a1) >< operacao (a3) >< operando (a0) >=< resultado (a2) >
 	# Imprime valor da cabeça
 	add a0, a1, zero
 	li a7, 1
@@ -289,6 +291,11 @@ fim_print_operando:
 	# Imprime resultado
 	add a0, a2, zero
 	li a7, 1
+	ecall
+	
+	# Imprime \n
+	li a0, '\n'
+	li a7, 11
 	ecall
 	
 	# Imprime \n
