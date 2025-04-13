@@ -1,7 +1,7 @@
 # calculadora-riscv
 ## Integrantes
 - Caio Draco Araújo Albuquerque Galvão - ########
-- Rafael Perez Carmanhani - ########
+- Rafael Perez Carmanhani - 15485420
 - Raí Fernando Dal Prá - ########
 - Pedro Henrique Barbosa Oliveira - 15483776
 
@@ -23,11 +23,17 @@ Para as entradas do usuário, ele deve digitar apenas um número ou uma operaç�
 
 ## Implementação
 ### Lista Encadeada
-Na implementação da calculadora, foi utilizada a estrutura de dados Lista Encadeada. Isso foi necessário para poder guardar os resultados prévios, possibilitando, assim, o uso da função "undo". O primeiro valor da execução ou o resultado de uma operação aritimética é guardado na cabeça da lista, permitindo, então, que o início dessa lista sempre tenha o resultado mais recente, podendo ser usado como o primeiro operando quando adequado. Quando a operação "undo" é realizada, o valor que está no início da lista é retirado dela, tornando o próximo elemento (o resultado anterior ao atual) a nova cabeça da lista.
+Na implementação da calculadora, foi utilizada a estrutura de dados Lista Encadeada. Isso foi necessário para poder guardar os resultados prévios, possibilitando, assim, o uso da função "undo". O primeiro valor da execução ou o resultado de uma operação aritimética é guardado na cabeça da lista, permitindo, então, que o início dessa lista sempre tenha o resultado mais recente, podendo ser usado como o primeiro operando quando adequado. Quando a operação "undo" é realizada, o valor que está no início da lista é retirado dela, tornando o próximo elemento (o resultado anterior ao atual) a nova cabeça da lista, possibilitando o uso da operação "undo" mais de uma vez.
 
 Para que isso fosse implementado em Assembly, foi criado na área .data um espaço de uma word em que guarda o endereço para a cabeça da lista (p_cabeca_lista). Inicialmente, o valor que está armazenado é 0, representando assim o um "ponteiro NULL". Na criação dos nós da lista, é alocado 9 bytes na Heap, sendo que os 4 primeiros bytes representam um ponteiro para o próximo nó da lista, os próximos 4 representam o dado guardado no nó, e, por fim, o último byte é para guardar o símbolo da operação realizada (uso estético na saída da função undo). Assim, quando um valor é adicionado na lista, um novo nó é criado, guardando na região do próximo nó o valor que está em p_cabeca_lista. Por fim, o endereço desse novo nó é guardado em p_cabeca_lista, tornando-o a nova cabeça da lista. Na remoção, é visitado o nó em que p_cabeca_lista aponta para obter o endereço do próximo elemento da lista, sobrescrevendo esse valor em p_cabeca_lista.
 
 ### Funções
 Uma parte essencial para a calculadora é a implementação de funções em Assembly. Essas funções são utilizadas para realizar as operações da calculadora, operações realizadas pela lista e a execução do código principal. Para isso, são utilizadas as instruções "jal" e "jr", em que, respectivamente, faz o jump para um label e guarda o valor do PC atual no registrador ra, e faz o jump para o valor guardado no registrador especificado. Assim, usando essas insttruções, é possível implementar algo similar as funções de uma linguagem de alto nível, permitindo uma legibilidade maior do código. Para os casos em que uma função faz uma chamada de outra função, é necessário guardar os os valores dos registradores usados na stack, com o intuito de poder recuperar os valores desses registradores posteriormente.
+
+#### Iniciar Calculadora
+
+trecho do código da função
+
+Essa função inicializa a calculadora. O primeiro inteiro é lido, 4 bytes são reservados na stack, o valor é emplihado, recebe o símbolo "0" (primeiro imput) e é adicionado na lista pela função add_inicio_lista. Depois disso, o ra é desempilhado e os 4 bytes da stack são liberados. O código avança para a função escolher_opcao.
 
 ## Exemplos de execução: TODO
