@@ -239,7 +239,7 @@ finalizar_operacao_atual:
 	sw a2, 12(sp) # salva a2 no stack
 	sw a3, 16(sp) # salva a3 no stack
 	
-	add a0, a2, zero
+	add a0, a2, zero # Salva a2 em a0 (parametro de add_inicio_lista)
 	jal ra, add_inicio_lista  # adiciona o em a0 na lista
 	
 	# Desempilha ra, a0, a1, a2, a3
@@ -259,36 +259,44 @@ finalizar_operacao_atual:
 	ecall
 	
 	# Imprime: < valor da cabeça (a1) >< operacao (a3) >< operando (a0) >=< resultado (a2) >
-	# Imprime valor da cabeça
+	# Imprime valor da cabeça (a1)
 	add a0, a1, zero
 	li a7, 1
 	ecall
 	
-	# Imprime caracetere da operacao
+	# Imprime caracetere da operacao (a3)
 	add a0, a3, zero
 	li a7, 11
 	ecall
 	
-	# Imprime operando
-	bgt t0, zero, print_operando 
+	# Imprime operando (t0). Se for negativo, imprime entre parênteses
+	bge t0, zero, print_operando  # Se não for negativo, apenas imprime o operando
+	
+	# Imprime parenteses da esquerda
 	li a7, 11
 	li a0, '('
 	ecall
+	
+	# Imprime valor do operando
 print_operando:
 	add a0, t0, zero
 	li a7, 1
 	ecall
-	bgt t0, zero, fim_print_operando
+	bge t0, zero, fim_print_operando # Verifica se é negativo
+	
+	# Se for negativo, imprime o parenteses da inteira
 	li a7, 11
 	li a0, ')'
 	ecall
+	# Se não for, pula para esse label
 fim_print_operando:
+	
 	# Imprime '='
 	li a0, '='
 	li a7, 11
 	ecall
 	
-	# Imprime resultado
+	# Imprime resultado (a2)
 	add a0, a2, zero
 	li a7, 1
 	ecall
