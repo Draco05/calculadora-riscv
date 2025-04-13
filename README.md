@@ -32,7 +32,24 @@ Uma parte essencial para a calculadora é a implementação de funções em Asse
 
 #### Iniciar Calculadora
 
-trecho do código da função
+'''
+
+	# Lê um inteiro
+	li a7, 5
+	ecall 
+ 
+	# Empilha o valor de ra
+	addi sp, sp, -4 # reserva 4 bytes no stack
+	sw ra, 0(sp) # salva o ra atual no stack
+	
+	li a1, 0 # simbolo do primeiro input é "nenhum"
+	jal ra, add_inicio_lista  # adiciona o valor lido (está em a0) na lista
+	
+	# Desempilha ra
+	lw ra, 0(sp) # recupera o ra da stack
+	addi sp, sp, 4 # libera os 4 bytes da stack
+	
+	# Continua em escolher_operacao
 
 Essa função inicializa a calculadora. O primeiro inteiro é lido, 4 bytes são reservados na stack, o valor é emplihado, recebe o símbolo "0" (primeiro imput) e é adicionado na lista pela função add_inicio_lista. Depois disso, o ra é desempilhado e os 4 bytes da stack são liberados. O código avança para a função escolher_opcao.
 
