@@ -16,20 +16,34 @@
 
 	.data
 	.align 0
-quebra: .asciz "\n"
-operacao: .space 3
-r_atual: .asciz "Resultado atual: "
+quebra: 
+	.asciz "\n"
+operacao: 
+	.space 3
+r_atual: 
+	.asciz "Resultado atual: "
+invalida:
+	.asciz "Operação inválida. Digite a operação novamente!\n"
+	
 	.align 2
-p_cabeca_lista: .word
+p_cabeca_lista: 
+	.word
+	
 	.text
 	.align 2
 	.globl main
+
+#-- Main: chama a execução da calculadora e encerra o programa
 main:
-	la s0, p_cabeca_lista
 	jal ra, iniciar_calculadora
 	
+	# Encerra o programa com código 0
 	li a7, 10
 	ecall
+
+###########################################
+### ---------  CALCULADORA ---------    ###
+###########################################
 
 #-- Função iniciar_calculadora
 # Lê a primeira entrada da calculadora
@@ -96,7 +110,9 @@ escolher_operacao:
 	li t0, 'f'
 	beq a0, t0, finalizar
 	
-	jr ra
+	# Se não ocorreu o jump para nehuma das operações, siginifca que a operação digitada é inválida
+	j operacao_invalida
+	
 	
 #-- Função soma
 # Lê um inteiro para a operação e faz a soma com a cabeça da lista_encadeada,
@@ -283,7 +299,18 @@ fim_print_operando:
 	# Volta para a escolha da operação
 	j escolher_operacao
 
-# Funções realacionadas a lista encadeada
+#-- Função operacao_invalida
+# Imprime uma mensagem e retorna para a escolha da operação
+operacao_invalida:
+	la a0, invalida
+	li a7, 4
+	ecall
+	j escolher_operacao
+	
+
+##############################################
+### --------- LISTA ENCADEADA ---------    ###
+##############################################
 
 # Aloca um espaço para um nó
 # Parametro a0: dado guardado	
