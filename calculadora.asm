@@ -59,7 +59,7 @@ iniciar_calculadora:
 	# Empilha o valor de ra
 	addi sp, sp, -4 # reserva 4 bytes no stack
 	sw ra, 0(sp) # salva o ra atual no stack
-	
+	li a1, 0 # simbolo do primeiro input é "nenhum"
 	jal ra, add_inicio_lista  # adiciona o valor lido (está em a0) na lista
 	
 	# Desempilha ra
@@ -251,7 +251,8 @@ finalizar_operacao_atual:
 	sw a2, 12(sp) # salva a2 no stack
 	sw a3, 16(sp) # salva a3 no stack
 	
-	add a0, a2, zero # Salva a2 em a0 (parametro de add_inicio_lista)
+	add a0, a2, zero # Salva a2 em a0 (parametro dado de add_inicio_lista)
+	add a1, a3, zero # Salva a3 em a1 (parametro símbolo de add_inicio_lista)
 	jal ra, add_inicio_lista  # adiciona o em a0 na lista
 	
 	# Desempilha ra, a0, a1, a2, a3
@@ -341,18 +342,22 @@ operacao_invalida:
 
 # Aloca um espaço para um nó
 # Parametro a0: dado guardado	
+# Parametro a1: simbolo da operação
 # Retorno a0: o endereço do nó alocado
 aloca_no:
 	mv t0, a0 # salva o dado em t0
+	mv t1, a1 # salva o simbolo em t1
 	li a7, 9 # alocar dinamicamente
-	li a0, 8 # 2 words: uma de ponteiro outra de dado 
+	li a0, 9 # 9 bytes: uma word de ponteiro, uma word do dado numérico, e um byte do símbolo da operação
 	ecall
 	sw zero, 0(a0) # ponteiro para proximo nó é NULL
 	sw t0, 4(a0) # armazena o dado no nó
+	sb t1, 8(a0) # armazena byte do simbolo no nó
 	jr ra
 
 # Adiciona um valor ao inicio da lista
 # Parametro a0: dado guardado na lista
+# Parametro a1: simbolo da operação
 add_inicio_lista:
 	addi sp, sp, -4 # reserva 4 bytes no stack
 	sw ra, 0(sp) # salva o ra atual no stack
@@ -380,11 +385,13 @@ fim_remove_cabeca_lista:
 
 
 # Retorna a0: valor guardado na cabeça da lista 
+# Retorna a1: simbolo guardado na cabeça da lista
 valor_cabeca_lista:
 	mv a0, zero # inicia o valor do dado como 0 (caso não tenha dado na lista)
 	la t0, p_cabeca_lista # t0 = endereço do ponteiro para cabeça da lista
 	lw t0, 0(t0) # t0 = endereço da cabeça da lista
 	beq zero, t0, fim_valor_cabeca_lista # cabeca da lista é NULL 
 	lw a0, 4(t0) # a0 = dado guardado na cabeça
+	lb a1, 8(t0) # a1 = simbolo guardado na cabeça
 fim_valor_cabeca_lista:
 	jr ra
