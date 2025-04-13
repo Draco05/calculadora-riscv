@@ -3,7 +3,7 @@
 - Caio Draco Araújo Albuquerque Galvão - ########
 - Rafael Perez Carmanhani - ########
 - Raí Fernando Dal Prá - ########
-- Pedro Henrique Barbosa Oliveira - ########
+- Pedro Henrique Barbosa Oliveira - 15483776
 
 ## Introdução
 O programa consiste em uma implementação de uma calculadora sequencial de inteiros em Assembly RISC-V. Esse projeto faz parte do trabalho da matéria Organização e Arquitetura de Computadores. 
