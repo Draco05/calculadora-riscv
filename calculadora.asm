@@ -201,8 +201,8 @@ divisao_zero:
 #-- Função undo
 # Desfaz a última operação, imprimindo o resultado atual
 undo:
-	# Remove o ultimo resultado da lista
-	# Empilha o valor de ra
+	#--- Lê valores da cabeça para impressão detalhada
+	#-- Empilha o valor de ra
 	addi sp, sp, -4 # reserva 4 bytes no stack
 	sw ra, 0(sp) # salva o ra atual no stack
 	
@@ -210,7 +210,7 @@ undo:
 	add t0, a0, zero
 	add t1, a1, zero
 	
-	# Desempilha ra
+	#-- Desempilha ra
 	lw ra, 0(sp) # recupera o ra da stack
 	addi sp, sp, 4 # libera os 4 bytes da stack
 	
@@ -236,7 +236,9 @@ undo:
 	li a7, 1
 	ecall
 	
-	# Empilha o valor de ra
+	
+	#--- Remove o ultimo resultado da lista
+	#-- Empilha o valor de ra
 	addi sp, sp, -4 # reserva 4 bytes no stack
 	sw ra, 0(sp) # salva o ra atual no stack
 	
@@ -244,7 +246,7 @@ undo:
 	jal ra, valor_cabeca_lista
 	add t0, a0, zero
 	
-	# Desempilha ra
+	#-- Desempilha ra
 	lw ra, 0(sp) # recupera o ra da stack
 	addi sp, sp, 4 # libera os 4 bytes da stack
 		
@@ -290,7 +292,7 @@ finalizar:
 #	a2 - resultado da operação
 #	a3 - caractere da operacao
 finalizar_operacao_atual:
-	# Empilha o valor de ra, a0, a1, a2, a3
+	#-- Empilha o valor de ra, a0, a1, a2, a3
 	addi sp, sp, -20 # reserva 20 bytes no stack
 	sw ra, 0(sp) # salva o ra atual no stack
 	sw a0, 4(sp) # salva a0 no stack
@@ -302,7 +304,7 @@ finalizar_operacao_atual:
 	add a1, a3, zero # Salva a3 em a1 (parametro símbolo de add_inicio_lista)
 	jal ra, add_inicio_lista  # adiciona o em a0 na lista
 	
-	# Desempilha ra, a0, a1, a2, a3
+	#-- Desempilha ra, a0, a1, a2, a3
 	lw ra, 0(sp) # recupera o ra da stack
 	lw a0, 4(sp) # recupera a0 da stack
 	lw a1, 8(sp) # recupera a1 da stack
@@ -318,7 +320,7 @@ finalizar_operacao_atual:
 	li a7, 4
 	ecall
 	
-	# Imprime: < valor da cabeça (a1) >< operacao (a3) >< operando (a0) >=< resultado (a2) >
+	#-- Imprime: < valor da cabeça (a1) >< operacao (a3) >< operando (a0) >=< resultado (a2) >
 	# Imprime valor da cabeça (a1)
 	add a0, a1, zero
 	li a7, 1
@@ -387,6 +389,7 @@ operacao_invalida:
 ### --------- LISTA ENCADEADA ---------    ###
 ##############################################
 
+#------ Função aloca_no
 # Aloca um espaço para um nó
 # Parametro a0: dado guardado	
 # Parametro a1: simbolo da operação
@@ -394,25 +397,36 @@ operacao_invalida:
 aloca_no:
 	mv t0, a0 # salva o dado em t0
 	mv t1, a1 # salva o simbolo em t1
-	li a7, 9 # alocar dinamicamente
+	
+	#-- Aloca dinamicamente
+	li a7, 9 # Sbrk 
 	li a0, 9 # 9 bytes: uma word de ponteiro, uma word do dado numérico, e um byte do símbolo da operação
 	ecall
+	
+	#-- Salva os dados no nó
 	sw zero, 0(a0) # ponteiro para proximo nó é NULL
 	sw t0, 4(a0) # armazena o dado no nó
 	sb t1, 8(a0) # armazena byte do simbolo no nó
+	
 	jr ra
 
+#------ Função add_inicio_lista
 # Adiciona um valor ao inicio da lista
 # Parametro a0: dado guardado na lista
 # Parametro a1: simbolo da operação
 add_inicio_lista:
+	#-- Empilha ra na stack
 	addi sp, sp, -4 # reserva 4 bytes no stack
 	sw ra, 0(sp) # salva o ra atual no stack
+	
 	jal ra, aloca_no  # aloca o nó -> a0 = endereço do novo nó criado
 	mv t0, a0 # salva o endereço em t0
+	
+	#-- Desempilha ra da stack
 	lw ra, 0(sp) # recupera o ra da stack
 	addi sp, sp, 4 # libera os 4 bytes da stack
 	
+	#-- Atualiza ponteiro da lista
 	la t1, p_cabeca_lista # t1 = endereço do ponteiro para a cabeça da lista
 	lw t2, 0(t1) # t2 = endereço da cabeça da lista
 	sw t2, 0(t0) # novo nó aponta para a cabeça da lista
@@ -420,24 +434,32 @@ add_inicio_lista:
 	
 	jr ra
 
+#------ Função remove_cabeca_lista
 # Remove o nó que está na cabeça da lista
 remove_cabeca_lista:
 	la t0, p_cabeca_lista # t0 = endereço do ponteiro para a cabeça da lista
 	lw t1, 0(t0) # t1 = endereço da cabeça da lista
-	beq zero, t1, fim_remove_cabeca_lista # caso endereço seja NULL
+	
+	beq zero, t1, fim_remove_cabeca_lista # finaliza função caso endereço seja NULL
+	
+	#-- Atualiza cabeça da lista
 	lw t1, 0(t1) # proximo nó
 	sw t1, 0(t0) # proximo nó vira a nova cabeça
 fim_remove_cabeca_lista:
 	jr ra
 
-
+#------ Função valor_cabeca_lista
+# Retorna os dados guardados na cabeça da lista (valor e símbolo)
 # Retorna a0: valor guardado na cabeça da lista 
 # Retorna a1: simbolo guardado na cabeça da lista
 valor_cabeca_lista:
 	mv a0, zero # inicia o valor do dado como 0 (caso não tenha dado na lista)
 	la t0, p_cabeca_lista # t0 = endereço do ponteiro para cabeça da lista
 	lw t0, 0(t0) # t0 = endereço da cabeça da lista
-	beq zero, t0, fim_valor_cabeca_lista # cabeca da lista é NULL 
+	
+	beq zero, t0, fim_valor_cabeca_lista # finaliza função se cabeca da lista é NULL 
+	
+	#-- Lê os dados para o retorno
 	lw a0, 4(t0) # a0 = dado guardado na cabeça
 	lb a1, 8(t0) # a1 = simbolo guardado na cabeça
 fim_valor_cabeca_lista:
