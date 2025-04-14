@@ -51,6 +51,9 @@ Uma parte essencial para a calculadora é a implementação de funções em Asse
 	
 	# Continua em escolher_operacao
 
+ ![image](https://github.com/user-attachments/assets/6c541695-342c-45f3-a719-e1e061218c02)
+
+
 Essa função inicializa a calculadora. O primeiro inteiro é lido, 4 bytes são reservados na stack, o valor é emplihado, recebe o símbolo "0" (primeiro imput) e é adicionado na lista pela função add_inicio_lista. Depois disso, o ra é desempilhado e os 4 bytes da stack são liberados. O código avança para a função escolher_opcao.
 
 ## Exemplos de execução: TODO
