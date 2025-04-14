@@ -19,7 +19,6 @@
 	.align 0	
 operacao: 
 	.space 3
-	
 undo_reverter:
 	.asciz "Revertendo operação ("
 undo_resultado_anterior:
@@ -69,7 +68,7 @@ iniciar_calculadora:
 	addi sp, sp, -4 # reserva 4 bytes no stack
 	sw ra, 0(sp) # salva o ra atual no stack
 	
-	li a1, 0 # simbolo do primeiro input é "nenhum"
+	li a1, 0 # simbolo do primeiro input é "nenhum" = \0
 	jal ra, add_inicio_lista  # adiciona o valor lido (está em a0) na lista
 	
 	# Desempilha ra
@@ -89,7 +88,7 @@ escolher_operacao:
 	sw ra, 0(sp) # salva o ra atual no stack
 	
 	jal ra, valor_cabeca_lista
-	add t1, a0, zero
+	add t1, a0, zero # Salva valor lido em t1
 	
 	# Desempilha ra
 	lw ra, 0(sp) # recupera o ra da stack
@@ -260,7 +259,7 @@ print_operando:
 	ecall
 	bge t0, zero, fim_print_operando # Verifica se é negativo
 	
-	# Se for negativo, imprime o parenteses da inteira
+	# Se for negativo, imprime o parenteses da direita 
 	li a7, 11
 	li a0, ')'
 	ecall
@@ -342,7 +341,7 @@ undo:
 	lw ra, 0(sp) # recupera o ra da stack
 	addi sp, sp, 4 # libera os 4 bytes da stack
 		
-	# Imprime ".Resultado atual: "
+	# Imprime ". Resultado atual: "
 	la a0, undo_resultado_atual
 	li a7, 4
 	ecall
@@ -366,7 +365,7 @@ undo_final:
 	li a7, 4
 	ecall
 	j escolher_operacao
-		
+
 #-- Função finalizar
 # Encerra a execução da calculadora
 finalizar:
