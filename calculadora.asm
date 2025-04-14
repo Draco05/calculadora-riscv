@@ -16,7 +16,7 @@
 
 	.data
 	# Dados estáticos de 1 byte
-	.align 0
+	.align 0	
 operacao: 
 	.space 3
 	
@@ -197,93 +197,7 @@ divisao_zero:
 	li a7, 4
 	ecall
 	j divisao
-
-#-- Função undo
-# Desfaz a última operação, imprimindo o resultado atual
-undo:
-	#--- Lê valores da cabeça para impressão detalhada
-	#-- Empilha o valor de ra
-	addi sp, sp, -4 # reserva 4 bytes no stack
-	sw ra, 0(sp) # salva o ra atual no stack
 	
-	jal ra, valor_cabeca_lista
-	add t0, a0, zero
-	add t1, a1, zero
-	
-	#-- Desempilha ra
-	lw ra, 0(sp) # recupera o ra da stack
-	addi sp, sp, 4 # libera os 4 bytes da stack
-	
-	beq t1, zero, undo_final
-	
-	# Imprime "Revertendo operação "
-	la a0, undo_reverter
-	li a7, 4
-	ecall
-	
-	# Imprime operacao
-	add a0, t1, zero
-	li a7, 11
-	ecall
-	
-	# Imprime " de resultado "
-	la a0, undo_resultado_anterior
-	li a7, 4
-	ecall
-	
-	# Imprime resultado antigo
-	add  a0, t0, zero
-	li a7, 1
-	ecall
-	
-	
-	#--- Remove o ultimo resultado da lista
-	#-- Empilha o valor de ra
-	addi sp, sp, -4 # reserva 4 bytes no stack
-	sw ra, 0(sp) # salva o ra atual no stack
-	
-	jal ra, remove_cabeca_lista
-	jal ra, valor_cabeca_lista
-	add t0, a0, zero
-	
-	#-- Desempilha ra
-	lw ra, 0(sp) # recupera o ra da stack
-	addi sp, sp, 4 # libera os 4 bytes da stack
-		
-	# Imprime ".Resultado atual: "
-	la a0, undo_resultado_atual
-	li a7, 4
-	ecall
-	
-	# Resultado está em t0
-	li a7, 1
-	add a0, t0, zero
-	ecall
-	
-	# Imprime '\n'
-	li a0, '\n'
-	li a7, 11
-	ecall
-	
-	# Volta para a escolha da operação
-	j escolher_operacao
-
-#-- Imprime uma mensagem dizendo que não há operações para reverter.
-undo_final:
-	la a0, undo_sem_operacao
-	li a7, 4
-	ecall
-	j escolher_operacao
-		
-#-- Função finalizar
-# Encerra a execução da calculadora
-finalizar:
-	la a0, finalizar_str
-	li a7, 4
-	ecall
-	jr ra
-
-
 #-- Função finalizar_operacao_atual
 # Salva o resultado na lista encadeada e imprime o resultado da operação
 # Parâmetros:
@@ -375,6 +289,91 @@ fim_print_operando:
 	
 	# Volta para a escolha da operação
 	j escolher_operacao
+
+#-- Função undo
+# Desfaz a última operação, imprimindo o resultado atual
+undo:
+	#--- Lê valores da cabeça para impressão detalhada
+	#-- Empilha o valor de ra
+	addi sp, sp, -4 # reserva 4 bytes no stack
+	sw ra, 0(sp) # salva o ra atual no stack
+	
+	jal ra, valor_cabeca_lista
+	add t0, a0, zero
+	add t1, a1, zero
+	
+	#-- Desempilha ra
+	lw ra, 0(sp) # recupera o ra da stack
+	addi sp, sp, 4 # libera os 4 bytes da stack
+	
+	beq t1, zero, undo_final
+	
+	# Imprime "Revertendo operação "
+	la a0, undo_reverter
+	li a7, 4
+	ecall
+	
+	# Imprime operacao
+	add a0, t1, zero
+	li a7, 11
+	ecall
+	
+	# Imprime " de resultado "
+	la a0, undo_resultado_anterior
+	li a7, 4
+	ecall
+	
+	# Imprime resultado antigo
+	add  a0, t0, zero
+	li a7, 1
+	ecall
+	
+	
+	#--- Remove o ultimo resultado da lista
+	#-- Empilha o valor de ra
+	addi sp, sp, -4 # reserva 4 bytes no stack
+	sw ra, 0(sp) # salva o ra atual no stack
+	
+	jal ra, remove_cabeca_lista
+	jal ra, valor_cabeca_lista
+	add t0, a0, zero
+	
+	#-- Desempilha ra
+	lw ra, 0(sp) # recupera o ra da stack
+	addi sp, sp, 4 # libera os 4 bytes da stack
+		
+	# Imprime ".Resultado atual: "
+	la a0, undo_resultado_atual
+	li a7, 4
+	ecall
+	
+	# Resultado está em t0
+	li a7, 1
+	add a0, t0, zero
+	ecall
+	
+	# Imprime '\n'
+	li a0, '\n'
+	li a7, 11
+	ecall
+	
+	# Volta para a escolha da operação
+	j escolher_operacao
+
+#-- Imprime uma mensagem dizendo que não há operações para reverter.
+undo_final:
+	la a0, undo_sem_operacao
+	li a7, 4
+	ecall
+	j escolher_operacao
+		
+#-- Função finalizar
+# Encerra a execução da calculadora
+finalizar:
+	la a0, finalizar_str
+	li a7, 4
+	ecall
+	jr ra
 
 #-- Função operacao_invalida
 # Imprime uma mensagem e retorna para a escolha da operação
